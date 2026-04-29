@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechBot — Suporte de TI Universitário</title>
+  <meta name="description" content="Chatbot de suporte técnico universitário powered by Rasa."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0f1a;--surface:#13162a;--surface2:#1a1e35;--border:#252945;
+      --accent:#5b6af0;--accent2:#7c4af3;--glow:rgba(91,106,240,.35);
+      --bot:#1e2440;--user:#5b6af0;--text:#e8eaf6;--muted:#7880a8;
+      --ok:#4ade80;--warn:#facc15;--err:#f87171;--radius:16px;
+    }
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;
+      justify-content:center;padding:12px;
+      background-image:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(91,106,240,.18) 0%,transparent 60%),
+                       radial-gradient(ellipse 60% 50% at 80% 110%,rgba(124,74,243,.14) 0%,transparent 55%);}
+    .header{text-align:center;margin-bottom:20px;animation:fadeDown .6s ease both}
+    .header-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;
+      margin:0 auto 10px;box-shadow:0 8px 32px var(--glow)}
+    .header h1{font-size:1.6rem;font-weight:700}
+    .header h1 span{background:linear-gradient(90deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .header p{color:var(--muted);font-size:.85rem;margin-top:3px}
+
+    .app{width:100%;max-width:780px;display:flex;gap:12px;align-items:flex-start}
+
+    /* ── Sidebar histórico ── */
+    .sidebar{width:200px;flex-shrink:0;background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius);padding:14px;animation:fadeUp .6s ease both;
+      max-height:72vh;overflow-y:auto}
+    .sidebar h3{font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;
+      letter-spacing:.06em;margin-bottom:10px}
+    .history-item{font-size:.75rem;color:var(--text);padding:6px 8px;border-radius:8px;
+      margin-bottom:4px;background:var(--surface2);border:1px solid var(--border);
+      cursor:default;transition:background .2s}
+    .history-item:hover{background:var(--border)}
+    .history-empty{color:var(--muted);font-size:.75rem;text-align:center;padding:8px}
+
+    /* ── Chat ── */
+    .chat-wrapper{flex:1;background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius);display:flex;flex-direction:column;
+      height:72vh;min-height:480px;box-shadow:0 24px 64px rgba(0,0,0,.5);
+      overflow:hidden;animation:fadeUp .6s ease both}
+
+    .chat-bar{display:flex;align-items:center;gap:10px;padding:12px 18px;
+      background:var(--surface2);border-bottom:1px solid var(--border)}
+    .dot-live{width:10px;height:10px;border-radius:50%;background:var(--ok);
+      box-shadow:0 0 8px var(--ok);flex-shrink:0;animation:pulse 2s infinite}
+    .chat-bar-info h2{font-size:.9rem;font-weight:600}
+    .chat-bar-info p{font-size:.75rem;color:var(--muted)}
+    .bar-actions{margin-left:auto;display:flex;gap:6px}
+    .bar-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);
+      font-size:.72rem;padding:4px 10px;border-radius:8px;cursor:pointer;transition:all .2s}
+    .bar-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+
+    .topics{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;
+      background:var(--surface);border-bottom:1px solid var(--border)}
+    .topic-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+      font-size:.72rem;padding:4px 10px;border-radius:999px;cursor:pointer;
+      transition:all .2s;white-space:nowrap}
+    .topic-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translateY(-1px)}
+
+    #error-banner{display:none;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.35);
+      color:#fca5a5;font-size:.78rem;text-align:center;padding:8px}
+
+    #messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;
+      gap:14px;scroll-behavior:smooth}
+    #messages::-webkit-scrollbar{width:6px}
+    #messages::-webkit-scrollbar-track{background:var(--surface)}
+    #messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    #messages::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+    .message{display:flex;gap:8px;max-width:88%;animation:fadeUp .22s ease both}
+    .message.bot{align-self:flex-start}
+    .message.user{align-self:flex-end;flex-direction:row-reverse}
+    .avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:14px}
+    .avatar.bot{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .avatar.user{background:var(--surface2);border:1px solid var(--border)}
+    .msg-wrap{display:flex;flex-direction:column;gap:6px}
+    .bubble{padding:14px 16px;border-radius:13px;font-size:.88rem;line-height:1.7;
+      word-break:break-word}
+    .bubble.bot{background:var(--bot);border:1px solid var(--border);border-bottom-left-radius:4px;white-space:pre-wrap}
+    .bubble.user{background:var(--user);border-bottom-right-radius:4px;color:#fff;white-space:pre-wrap}
+    .bubble.greeting{background:linear-gradient(135deg,rgba(91,106,240,.15),rgba(124,74,243,.15));border:1px solid rgba(91,106,240,.3);}
+    
+    /* Listas */
+    .bubble ul, .bubble ol{margin:8px 0;padding-left:24px}
+    .bubble li{margin:4px 0;line-height:1.8}
+    .bubble strong{color:#fff;font-weight:600}
+    .bubble code{background:rgba(255,255,255,.12);padding:3px 6px;border-radius:4px;font-size:.85em;font-family:monospace}
+    
+    /* Seções/subtítulos */
+    .bubble h3{color:#fff;font-size:.95rem;margin:8px 0 8px;font-weight:600}
+    .bubble h4{color:#e8eaf6;font-size:.9rem;margin:6px 0 4px;font-weight:500}
+    
+    /* Topic chips/badges */
+    .topic-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(91,106,240,.15);
+      border:1px solid rgba(91,106,240,.4);color:#a8b5ff;padding:6px 12px;border-radius:8px;
+      font-size:.85rem;font-weight:500;margin:3px 6px 3px 0;transition:all .2s;cursor:pointer;
+      appearance:none;-webkit-appearance:none}
+    .topic-chip:hover{background:rgba(91,106,240,.25);border-color:rgba(91,106,240,.6)}
+    .topic-chip.wifi{border-color:rgba(59,197,234,.5);background:rgba(59,197,234,.12);color:#3bc5ea}
+    .topic-chip.email{border-color:rgba(245,101,101,.5);background:rgba(245,101,101,.12);color:#f56565}
+    .topic-chip.segurança{border-color:rgba(184,134,11,.5);background:rgba(184,134,11,.12);color:#fca311}
+    .topic-chip.software{border-color:rgba(76,175,80,.5);background:rgba(76,175,80,.12);color:#4caf50}
+    .topic-chip.impressora{border-color:rgba(156,39,176,.5);background:rgba(156,39,176,.12);color:#9c27b0}
+    .topic-chip.moodle{border-color:rgba(76,175,80,.5);background:rgba(76,175,80,.12);color:#4caf50}
+    .topic-chip.vpn{border-color:rgba(103,58,183,.5);background:rgba(103,58,183,.12);color:#673ab7}
+    .topic-chips{display:flex;flex-wrap:wrap;margin:10px 0;gap:0}
+
+    /* ── Botões de resposta rápida ── */
+    .btn-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:8px;margin-top:12px;width:100%}
+    .rasa-btn{background:transparent;border:1.5px solid var(--accent);color:var(--accent);
+      font-size:.80rem;padding:8px 12px;border-radius:10px;cursor:pointer;
+      transition:all .25s;font-family:inherit;font-weight:500;white-space:nowrap}
+    .rasa-btn:hover{background:var(--accent);color:#fff;transform:translateY(-2px);box-shadow:0 4px 12px var(--glow)}
+    .rasa-btn:active{transform:translateY(0)}
+    
+    /* Cores para botões específicos */
+    .rasa-btn.wifi{border-color:rgba(59,197,234,.5);color:#3bc5ea}
+    .rasa-btn.wifi:hover{background:#3bc5ea;box-shadow:0 4px 12px rgba(59,197,234,.4)}
+    .rasa-btn.email{border-color:rgba(245,101,101,.5);color:#f56565}
+    .rasa-btn.email:hover{background:#f56565;box-shadow:0 4px 12px rgba(245,101,101,.4)}
+    .rasa-btn.senha{border-color:rgba(245,165,0,.5);color:#fca311}
+    .rasa-btn.senha:hover{background:#fca311;box-shadow:0 4px 12px rgba(245,165,0,.4)}
+    .rasa-btn.software{border-color:rgba(76,175,80,.5);color:#4caf50}
+    .rasa-btn.software:hover{background:#4caf50;box-shadow:0 4px 12px rgba(76,175,80,.4)}
+    .rasa-btn.impressora{border-color:rgba(156,39,176,.5);color:#9c27b0}
+    .rasa-btn.impressora:hover{background:#9c27b0;box-shadow:0 4px 12px rgba(156,39,176,.4)}
+    .rasa-btn.moodle{border-color:rgba(76,175,80,.5);color:#4caf50}
+    .rasa-btn.moodle:hover{background:#4caf50;box-shadow:0 4px 12px rgba(76,175,80,.4)}
+    .rasa-btn.vpn{border-color:rgba(103,58,183,.5);color:#673ab7}
+    .rasa-btn.vpn:hover{background:#673ab7;box-shadow:0 4px 12px rgba(103,58,183,.4)}
+    .rasa-btn.portal{border-color:rgba(33,150,243,.5);color:#2196f3}
+    .rasa-btn.portal:hover{background:#2196f3;box-shadow:0 4px 12px rgba(33,150,243,.4)}
+    .rasa-btn.antivirus{border-color:rgba(156,39,176,.5);color:#9c27b0}
+    .rasa-btn.antivirus:hover{background:#9c27b0;box-shadow:0 4px 12px rgba(156,39,176,.4)}
+    .rasa-btn.lento{border-color:rgba(255,87,34,.5);color:#ff5722}
+    .rasa-btn.lento:hover{background:#ff5722;box-shadow:0 4px 12px rgba(255,87,34,.4)}
+    .rasa-btn.lab{border-color:rgba(105,105,105,.5);color:#a9a9a9}
+    .rasa-btn.lab:hover{background:#a9a9a9;box-shadow:0 4px 12px rgba(105,105,105,.4)}
+    .rasa-btn.nuvem{border-color:rgba(52,168,219,.5);color:#34a8db}
+    .rasa-btn.nuvem:hover{background:#34a8db;box-shadow:0 4px 12px rgba(52,168,219,.4)}
+    .rasa-btn.seguranca{border-color:rgba(255,152,0,.5);color:#ff9800}
+    .rasa-btn.seguranca:hover{background:#ff9800;box-shadow:0 4px 12px rgba(255,152,0,.4)}
+    .rasa-btn.celular{border-color:rgba(233,30,99,.5);color:#e91e63}
+    .rasa-btn.celular:hover{background:#e91e63;box-shadow:0 4px 12px rgba(233,30,99,.4)}
+    .rasa-btn.video{border-color:rgba(156,39,176,.5);color:#9c27b0}
+    .rasa-btn.video:hover{background:#9c27b0;box-shadow:0 4px 12px rgba(156,39,176,.4)}
+    .rasa-btn.remoto{border-color:rgba(59,197,234,.5);color:#3bc5ea}
+    .rasa-btn.remoto:hover{background:#3bc5ea;box-shadow:0 4px 12px rgba(59,197,234,.4)}
+    .rasa-btn.chamado{border-color:rgba(255,152,0,.5);color:#ff9800}
+    .rasa-btn.chamado:hover{background:#ff9800;box-shadow:0 4px 12px rgba(255,152,0,.4)}
+    .rasa-btn.status{border-color:rgba(76,175,80,.5);color:#4caf50}
+    .rasa-btn.status:hover{background:#4caf50;box-shadow:0 4px 12px rgba(76,175,80,.4)}
+
+    /* ── Typing ── */
+    .typing .bubble{display:flex;gap:5px;align-items:center;padding:11px 14px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1.4s infinite}
+    .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+
+    .input-area{display:flex;gap:10px;align-items:flex-end;padding:14px 16px;
+      background:var(--surface2);border-top:1px solid var(--border)}
+    #user-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+      color:var(--text);font-family:inherit;font-size:.90rem;padding:11px 15px;
+      resize:none;min-height:44px;max-height:120px;outline:none;transition:border-color .2s,box-shadow .2s}
+    #user-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+    #user-input::placeholder{color:var(--muted)}
+    #send-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none;border-radius:10px;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px var(--glow)}
+    #send-btn:hover{transform:scale(1.08)}
+    #send-btn:active{transform:scale(.95)}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+    @keyframes blink{0%,80%,100%{transform:scale(0);opacity:.4}40%{transform:scale(1);opacity:1}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    @media(max-width:640px){
+      .sidebar{display:none}
+      .chat-wrapper{height:85vh}
+      .topics{display:none}
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">🤖</div>
+  <h1><span>TechBot</span></h1>
+  <p>Suporte de TI Universitário • Powered by Rasa</p>
+</div>
+
+<div class="app">
+  <!-- Histórico da sessão -->
+  <div class="sidebar">
+    <h3>📋 Histórico da Sessão</h3>
+    <div id="history-list"><p class="history-empty">Nenhuma pergunta ainda</p></div>
+  </div>
+
+  <div class="chat-wrapper">
+    <div class="chat-bar">
+      <div class="dot-live" id="status-dot"></div>
+      <div class="chat-bar-info">
+        <h2>TechBot — Suporte de TI</h2>
+        <p id="status-text">Conectando ao servidor Rasa...</p>
+      </div>
+      <div class="bar-actions">
+        <button class="bar-btn" onclick="clearChat()" title="Limpar conversa">🗑️ Limpar</button>
+        <button class="bar-btn" onclick="sendMsg('Status dos sistemas')" title="Ver status">📊 Status</button>
+      </div>
+    </div>
+
+    <div class="topics">
+      <button class="topic-btn" onclick="sendMsg('Wi-Fi não conecta')">🌐 Wi-Fi</button>
+      <button class="topic-btn" onclick="sendMsg('Problema com e-mail')">📧 E-mail</button>
+      <button class="topic-btn" onclick="sendMsg('Esqueci minha senha')">🔐 Senha</button>
+      <button class="topic-btn" onclick="sendMsg('Softwares gratuitos')">💻 Software</button>
+      <button class="topic-btn" onclick="sendMsg('Não consigo acessar o Moodle')">📚 Moodle</button>
+      <button class="topic-btn" onclick="sendMsg('Laboratórios de informática')">🖥️ Labs</button>
+      <button class="topic-btn" onclick="sendMsg('Segurança da informação')">🔐 Segurança</button>
+      <button class="topic-btn" onclick="sendMsg('Videoconferência')">🎥 Vídeo</button>
+      <button class="topic-btn" onclick="sendMsg('Acesso remoto')">🌐 Remoto</button>
+      <button class="topic-btn" onclick="sendMsg('Armazenamento em nuvem')">☁️ Nuvem</button>
+      <button class="topic-btn" onclick="sendMsg('Quero abrir um chamado')">🎫 Chamado</button>
+      <button class="topic-btn" onclick="sendMsg('Status dos sistemas')">📊 Status</button>
+    </div>
+
+    <div id="error-banner">
+      ⚠️ Servidor Rasa offline. Execute: <code>rasa run --enable-api --cors "*"</code>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="input-area">
+      <textarea id="user-input" placeholder="Digite sua dúvida..." rows="1"
+        aria-label="Mensagem"></textarea>
+      <button id="send-btn" aria-label="Enviar">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const RASA = 'http://localhost:5005/webhooks/rest/webhook';
+  const UID  = 'user_' + Math.random().toString(36).slice(2,9);
+  const sessionTopics = [];
+
+  const msgEl    = document.getElementById('messages');
+  const inputEl  = document.getElementById('user-input');
+  const sendBtn  = document.getElementById('send-btn');
+  const dotEl    = document.getElementById('status-dot');
+  const statusEl = document.getElementById('status-text');
+  const errEl    = document.getElementById('error-banner');
+  const histEl   = document.getElementById('history-list');
+
+  /* ── Topic icons map ── */
+  const topicIcon = {
+    wifi:'🌐', email:'📧', senha:'🔐', password:'🔐', software:'💻',
+    moodle:'📚', ava:'📚', lab:'🖥️', laboratório:'🖥️', segurança:'🔒',
+    vírus:'🛡️', antivírus:'🛡️', vpn:'🔒', impressora:'🖨️', portal:'🎓',
+    matrícula:'🎓', computador:'🐌', lento:'🐌', chamado:'🎫', ticket:'🎫',
+    status:'📊', sistemas:'📊', nuvem:'☁️', drive:'☁️', celular:'📱',
+    mobile:'📱', vídeo:'🎥', videoconferência:'🎥', remoto:'🖥️', acesso:'🖥️',
+  };
+
+  function getIcon(text) {
+    const low = text.toLowerCase();
+    for (const [k, v] of Object.entries(topicIcon)) {
+      if (low.includes(k)) return v;
+    }
+    return '💬';
+  }
+
+  function getGreetingPayload(topicText) {
+    const low = topicText.toLowerCase();
+    if (low.includes('wi-fi')) return '/ask_wifi';
+    if (low.includes('e-mail')) return '/ask_email';
+    if (low.includes('senha')) return '/ask_password_reset';
+    if (low.includes('software')) return '/ask_software';
+    if (low.includes('impressora')) return '/ask_printer';
+    if (low.includes('moodle')) return '/ask_moodle';
+    if (low.includes('portal') || low.includes('matr')) return '/ask_portal';
+    if (low.includes('vpn')) return '/ask_vpn';
+    if (low.includes('antiv')) return '/ask_antivirus';
+    if (low.includes('pc lento') || low.includes('lento')) return '/ask_computer_slow';
+    if (low.includes('laborat')) return '/ask_lab';
+    if (low.includes('nuvem')) return '/ask_cloud_storage';
+    if (low.includes('seguran')) return '/ask_security';
+    if (low.includes('celular')) return '/ask_mobile';
+    if (low.includes('videoconfer')) return '/ask_videoconference';
+    if (low.includes('acesso remoto') || low.includes('remoto')) return '/ask_remote_access';
+    if (low.includes('chamado')) return '/open_ticket';
+    if (low.includes('status')) return '/check_system_status';
+    return null;
+  }
+
+  function addToHistory(text) {
+    if (sessionTopics.length === 0) histEl.innerHTML = '';
+    const short = text.length > 28 ? text.slice(0, 26) + '…' : text;
+    const icon  = getIcon(text);
+    sessionTopics.push(short);
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.textContent = icon + ' ' + short;
+    histEl.appendChild(div);
+  }
+
+  /* ── Format markdown-like text ── */
+  function fmt(txt, isGreeting = false) {
+    // Primeiro, aplicar formatações básicas
+    let html = txt
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/`(.+?)`/g,'<code>$1</code>');
+    
+    // Se for mensagem de saudação, renderizar tópicos como chips
+    if (isGreeting) {
+      // Detectar linhas com tópicos (separados por |)
+      const lines = html.split('\n');
+      const result = [];
+      
+      for (let line of lines) {
+        if (line.includes('|') && (line.includes('🌐') || line.includes('📧') || line.includes('🔐'))) {
+          // Quebrar a linha em tópicos e renderizar como chips
+          const topics = line.split('|').map(t => t.trim()).filter(t => t);
+          let chipsLine = '<div class="topic-chips">';
+          
+          const topicColors = {
+            'wifi': 'wifi', '🌐': 'wifi',
+            'email': 'email', '📧': 'email',
+            'senha': 'segurança', '🔐': 'segurança',
+            'software': 'software', '💻': 'software',
+            'impressora': 'impressora', '🖨️': 'impressora',
+            'moodle': 'moodle', '📚': 'moodle', 'ava': 'moodle',
+            'vpn': 'vpn', 'antivírus': 'vpn', '🛡️': 'vpn',
+          };
+          
+          for (let topic of topics) {
+            let chipClass = 'topic-chip';
+            for (const [key, color] of Object.entries(topicColors)) {
+              if (topic.toLowerCase().includes(key)) {
+                chipClass += ' ' + color;
+                break;
+              }
+            }
+            const payload = getGreetingPayload(topic);
+            const payloadAttr = payload ? ` data-payload="${payload}"` : '';
+            chipsLine += `<button type="button" class="${chipClass}"${payloadAttr}>${topic}</button>`;
+          }
+          
+          chipsLine += '</div>';
+          result.push(chipsLine);
+        } else if (line.trim()) {
+          result.push(line);
+        }
+      }
+      
+      html = result.join('\n');
+    }
+    
+    // Detectar e converter listas numeradas (1. 2. 3.)
+    if (/^\s*\d+\.|^\s*[-*•]\s/m.test(html)) {
+      const lines = html.split('\n');
+      let inList = false;
+      let listType = null;
+      let result = [];
+      
+      for (let line of lines) {
+        const numMatch = line.match(/^\s*(\d+)\.\s+(.*)/);
+        const bulletMatch = line.match(/^\s*[-*•]\s+(.*)/);
+        
+        if (numMatch) {
+          if (listType !== 'ol') {
+            if (inList) result.push('</li></ul>');
+            result.push('<ol>');
+            listType = 'ol';
+            inList = true;
+          }
+          result.push(`<li>${numMatch[2]}</li>`);
+        } else if (bulletMatch) {
+          if (listType !== 'ul') {
+            if (inList) result.push('</li></ol>');
+            result.push('<ul>');
+            listType = 'ul';
+            inList = true;
+          }
+          result.push(`<li>${bulletMatch[1]}</li>`);
+        } else if (line.trim()) {
+          if (inList) {
+            result.push(`</${listType}>`);
+            inList = false;
+            listType = null;
+          }
+          result.push(line);
+        }
+      }
+      
+      if (inList) result.push(`</${listType}>`);
+      html = result.join('\n');
+    }
+    
+    return html;
+  }
+
+  function addMessage(text, sender) {
+    const wrap   = document.createElement('div');
+    wrap.className = `message ${sender}`;
+    const avatar = document.createElement('div');
+    avatar.className = `avatar ${sender}`;
+    avatar.textContent = sender === 'bot' ? '🤖' : '👤';
+    const msgWrap = document.createElement('div');
+    msgWrap.className = 'msg-wrap';
+    const bubble = document.createElement('div');
+    const isGreeting = sender === 'bot' && text.includes('Posso te ajudar com');
+    bubble.className = `bubble ${sender} ${isGreeting ? 'greeting' : ''}`;
+    bubble.innerHTML = fmt(text, isGreeting);
+    if (isGreeting) {
+      bubble.querySelectorAll('[data-payload]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sendMsg(btn.dataset.payload.replace(/^\//, '').replace(/_/g, ' '));
+        });
+      });
+    }
+    msgWrap.appendChild(bubble);
+    wrap.appendChild(avatar);
+    wrap.appendChild(msgWrap);
+    msgEl.appendChild(wrap);
+    msgEl.scrollTop = msgEl.scrollHeight;
+    return msgWrap;
+  }
+
+  function addButtons(msgWrap, buttons) {
+    const group = document.createElement('div');
+    group.className = 'btn-group';
+    buttons.forEach(btn => {
+      const b = document.createElement('button');
+      b.className = 'rasa-btn';
+      b.textContent = btn.title;
+      
+      // Detectar tópico e adicionar classe de cor
+      const title = btn.title.toLowerCase();
+      if (title.includes('wi-fi')) b.classList.add('wifi');
+      else if (title.includes('e-mail')) b.classList.add('email');
+      else if (title.includes('senha')) b.classList.add('senha');
+      else if (title.includes('software')) b.classList.add('software');
+      else if (title.includes('impressora')) b.classList.add('impressora');
+      else if (title.includes('moodle')) b.classList.add('moodle');
+      else if (title.includes('portal') || title.includes('matrícula')) b.classList.add('portal');
+      else if (title.includes('vpn')) b.classList.add('vpn');
+      else if (title.includes('antivírus')) b.classList.add('antivirus');
+      else if (title.includes('lento')) b.classList.add('lento');
+      else if (title.includes('laboratório')) b.classList.add('lab');
+      else if (title.includes('nuvem')) b.classList.add('nuvem');
+      else if (title.includes('segurança')) b.classList.add('seguranca');
+      else if (title.includes('celular')) b.classList.add('celular');
+      else if (title.includes('videoconferência')) b.classList.add('video');
+      else if (title.includes('acesso remoto')) b.classList.add('remoto');
+      else if (title.includes('chamado')) b.classList.add('chamado');
+      else if (title.includes('status')) b.classList.add('status');
+      
+      b.onclick = () => {
+        group.remove();
+        sendMsg(btn.payload.replace(/^\//, '').replace(/_/g,' '));
+      };
+      group.appendChild(b);
+    });
+    msgWrap.appendChild(group);
+    msgEl.scrollTop = msgEl.scrollHeight;
+  }
+
+  function showTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'message bot typing';
+    wrap.id = 'typing';
+    wrap.innerHTML = '<div class="avatar bot">🤖</div><div class="msg-wrap"><div class="bubble bot"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+    msgEl.appendChild(wrap);
+    msgEl.scrollTop = msgEl.scrollHeight;
+  }
+
+  function removeTyping() { document.getElementById('typing')?.remove(); }
+
+  function setOnline(ok) {
+    dotEl.style.background  = ok ? 'var(--ok)' : 'var(--err)';
+    dotEl.style.boxShadow   = ok ? '0 0 8px var(--ok)' : '0 0 8px var(--err)';
+    statusEl.textContent    = ok ? 'Online — pronto para ajudar!' : 'Servidor Rasa offline';
+    errEl.style.display     = ok ? 'none' : 'block';
+  }
+
+  async function sendMsg(text) {
+    text = text.trim();
+    if (!text) return;
+    addMessage(text, 'user');
+    addToHistory(text);
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    showTyping();
+    try {
+      const res  = await fetch(RASA, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({sender: UID, message: text})
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      setOnline(true);
+      const data = await res.json();
+      removeTyping();
+      if (!data.length) {
+        addMessage('Desculpe, não entendi. Pode reformular?', 'bot');
+      } else {
+        data.forEach((d, i) => {
+          setTimeout(() => {
+            const msgWrap = addMessage(d.text || '...', 'bot');
+            if (d.buttons && d.buttons.length) addButtons(msgWrap, d.buttons);
+          }, i * 320);
+        });
+      }
+    } catch {
+      removeTyping();
+      setOnline(false);
+      addMessage('⚠️ Não consigo conectar ao Rasa.\nInicie com:\n`rasa run --enable-api --cors "*"`', 'bot');
+    }
+  }
+
+  function clearChat() {
+    msgEl.innerHTML = '';
+    histEl.innerHTML = '<p class="history-empty">Nenhuma pergunta ainda</p>';
+    sessionTopics.length = 0;
+    sendMsg('Olá');
+  }
+
+  sendBtn.addEventListener('click', () => sendMsg(inputEl.value));
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(inputEl.value); }
+  });
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = inputEl.scrollHeight + 'px';
+  });
+
+  /* ── Saudação automática ── */
+  window.addEventListener('load', async () => {
+    await new Promise(r => setTimeout(r, 700));
+    showTyping();
+    try {
+      const res  = await fetch(RASA, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({sender: UID, message: 'Olá'})
+      });
+      const data = await res.json();
+      removeTyping();
+      setOnline(true);
+      data.forEach((d, i) => {
+        setTimeout(() => {
+          const mw = addMessage(d.text || '', 'bot');
+          if (d.buttons && d.buttons.length) addButtons(mw, d.buttons);
+        }, i * 320);
+      });
+    } catch {
+      removeTyping();
+      setOnline(false);
+      addMessage('👋 Sou o **TechBot**!\n\n⚠️ Servidor Rasa offline. Inicie com:\n`rasa run --enable-api --cors "*"`\n\nDepois recarregue a página.', 'bot');
+    }
+  });
+</script>
+</body>
+</html>

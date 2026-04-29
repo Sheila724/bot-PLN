@@ -1,0 +1,170 @@
+version: "3.1"
+
+rules:
+  # ── Básicas ───────────────────────────────────────────────
+  - rule: Saudar o usuário
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Despedida
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - rule: Responder se é um bot
+    steps:
+      - intent: bot_challenge
+      - action: utter_bot_challenge
+
+  - rule: Responder agradecimento
+    steps:
+      - intent: thank
+      - action: utter_thank
+
+  - rule: Afirmar / concordar
+    steps:
+      - intent: affirm
+      - action: utter_thank
+
+  - rule: Negar / discordar
+    steps:
+      - intent: deny
+      - action: utter_default
+
+  - rule: Fallback
+    steps:
+      - intent: nlu_fallback
+      - action: utter_default
+
+  # ── Tópicos originais ─────────────────────────────────────
+  - rule: Problemas com Wi-Fi
+    steps:
+      - intent: ask_wifi
+      - action: utter_ask_wifi
+
+  - rule: Problemas com e-mail
+    steps:
+      - intent: ask_email
+      - action: utter_ask_email
+
+  - rule: Redefinição de senha
+    steps:
+      - intent: ask_password_reset
+      - action: utter_ask_password_reset
+
+  - rule: Softwares e licenças
+    steps:
+      - intent: ask_software
+      - action: utter_ask_software
+
+  - rule: Problemas com impressora
+    steps:
+      - intent: ask_printer
+      - action: utter_ask_printer
+
+  - rule: Problemas com Moodle
+    steps:
+      - intent: ask_moodle
+      - action: utter_ask_moodle
+
+  - rule: Problemas com matrícula
+    steps:
+      - intent: ask_matricula
+      - action: utter_ask_matricula
+
+  - rule: Problemas com portal do aluno
+    steps:
+      - intent: ask_portal
+      - action: utter_ask_portal
+
+  - rule: Computador lento
+    steps:
+      - intent: ask_computer_slow
+      - action: utter_ask_computer_slow
+
+  - rule: Contato com suporte
+    steps:
+      - intent: ask_contact_support
+      - action: utter_ask_contact_support
+
+  - rule: Horário de atendimento
+    steps:
+      - intent: ask_hours
+      - action: utter_ask_hours
+
+  - rule: VPN institucional
+    steps:
+      - intent: ask_vpn
+      - action: utter_ask_vpn
+
+  - rule: Antivírus
+    steps:
+      - intent: ask_antivirus
+      - action: utter_ask_antivirus
+
+  # ── Novos tópicos ─────────────────────────────────────────
+  - rule: Laboratórios de informática
+    steps:
+      - intent: ask_lab
+      - action: utter_ask_lab
+
+  - rule: Armazenamento em nuvem
+    steps:
+      - intent: ask_cloud_storage
+      - action: utter_ask_cloud_storage
+
+  - rule: Segurança da informação
+    steps:
+      - intent: ask_security
+      - action: utter_ask_security
+
+  - rule: Dispositivos móveis
+    steps:
+      - intent: ask_mobile
+      - action: utter_ask_mobile
+
+  - rule: Videoconferência
+    steps:
+      - intent: ask_videoconference
+      - action: utter_ask_videoconference
+
+  - rule: Acesso remoto
+    steps:
+      - intent: ask_remote_access
+      - action: utter_ask_remote_access
+
+  # ── Status dos sistemas ───────────────────────────────────
+  - rule: Verificar status dos sistemas
+    steps:
+      - intent: check_system_status
+      - action: action_check_system_status
+
+  # ── Feedback ─────────────────────────────────────────────
+  - rule: Feedback positivo
+    steps:
+      - intent: give_feedback_positive
+      - action: utter_feedback_positive
+
+  - rule: Feedback negativo
+    steps:
+      - intent: give_feedback_negative
+      - action: utter_feedback_negative
+
+  # ── Form: Abertura de chamado ─────────────────────────────
+  - rule: Ativar formulário de chamado
+    steps:
+      - intent: open_ticket
+      - action: utter_ask_open_ticket
+      - action: chamado_form
+      - active_loop: chamado_form
+
+  - rule: Submeter formulário de chamado
+    condition:
+      - active_loop: chamado_form
+    steps:
+      - action: chamado_form
+      - active_loop: null
+      - slot_was_set:
+          - requested_slot: null
+      - action: action_submit_chamado

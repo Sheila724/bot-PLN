@@ -1,0 +1,128 @@
+version: "3.1"
+
+stories:
+  - story: saudação simples e dúvida de wifi
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: ask_wifi
+      - action: utter_ask_wifi
+      - intent: give_feedback_positive
+      - action: utter_feedback_positive
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - story: problema com email e senha
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: ask_email
+      - action: utter_ask_email
+      - intent: ask_password_reset
+      - action: utter_ask_password_reset
+      - intent: thank
+      - action: utter_thank
+
+  - story: múltiplas perguntas numa sessão
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: ask_moodle
+      - action: utter_ask_moodle
+      - intent: ask_portal
+      - action: utter_ask_portal
+      - intent: ask_matricula
+      - action: utter_ask_matricula
+      - intent: thank
+      - action: utter_thank
+
+  - story: PC lento e abertura de chamado
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: ask_computer_slow
+      - action: utter_ask_computer_slow
+      - intent: give_feedback_negative
+      - action: utter_feedback_negative
+      - intent: open_ticket
+      - action: utter_ask_open_ticket
+      - action: chamado_form
+      - active_loop: chamado_form
+      - slot_was_set:
+          - user_name: "Maria Silva"
+      - slot_was_set:
+          - user_matricula: "2023001234"
+      - slot_was_set:
+          - problema_descricao: "PC do laboratório muito lento, trava ao abrir o navegador"
+      - action: chamado_form
+      - active_loop: null
+      - action: action_submit_chamado
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - story: verificar status dos sistemas
+    steps:
+      - intent: check_system_status
+      - action: action_check_system_status
+      - intent: ask_contact_support
+      - action: utter_ask_contact_support
+
+  - story: segurança e VPN
+    steps:
+      - intent: ask_security
+      - action: utter_ask_security
+      - intent: ask_vpn
+      - action: utter_ask_vpn
+      - intent: thank
+      - action: utter_thank
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - story: acesso remoto ao laboratório
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: ask_remote_access
+      - action: utter_ask_remote_access
+      - intent: ask_vpn
+      - action: utter_ask_vpn
+      - intent: give_feedback_positive
+      - action: utter_feedback_positive
+
+  - story: configuração mobile e videoconferência
+    steps:
+      - intent: ask_mobile
+      - action: utter_ask_mobile
+      - intent: ask_videoconference
+      - action: utter_ask_videoconference
+      - intent: give_feedback_positive
+      - action: utter_feedback_positive
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - story: laboratório e armazenamento em nuvem
+    steps:
+      - intent: ask_lab
+      - action: utter_ask_lab
+      - intent: ask_cloud_storage
+      - action: utter_ask_cloud_storage
+      - intent: thank
+      - action: utter_thank
+
+  - story: chamado simples após suporte
+    steps:
+      - intent: ask_wifi
+      - action: utter_ask_wifi
+      - intent: open_ticket
+      - action: utter_ask_open_ticket
+      - action: chamado_form
+      - active_loop: chamado_form
+      - slot_was_set:
+          - user_name: "João Santos"
+      - slot_was_set:
+          - user_matricula: "2022009876"
+      - slot_was_set:
+          - problema_descricao: "Wi-Fi eduroam não conecta no notebook"
+      - action: chamado_form
+      - active_loop: null
+      - action: action_submit_chamado

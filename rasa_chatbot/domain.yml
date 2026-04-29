@@ -1,0 +1,594 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - thank
+  - bot_challenge
+  - ask_wifi
+  - ask_email
+  - ask_password_reset
+  - ask_software
+  - ask_printer
+  - ask_moodle
+  - ask_matricula
+  - ask_portal
+  - ask_computer_slow
+  - ask_contact_support
+  - ask_hours
+  - ask_vpn
+  - ask_antivirus
+  # Novos tópicos
+  - ask_lab
+  - ask_cloud_storage
+  - ask_security
+  - ask_mobile
+  - ask_videoconference
+  - ask_remote_access
+  # Novas funcionalidades
+  - open_ticket
+  - check_system_status
+  - give_feedback_positive
+  - give_feedback_negative
+
+entities:
+  - os_type
+
+slots:
+  user_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: chamado_form
+            requested_slot: user_name
+
+  user_matricula:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: chamado_form
+            requested_slot: user_matricula
+
+  problema_descricao:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: chamado_form
+            requested_slot: problema_descricao
+
+  os_type:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: os_type
+
+  ticket_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+forms:
+  chamado_form:
+    required_slots:
+      - user_name
+      - user_matricula
+      - problema_descricao
+
+actions:
+  - action_submit_chamado
+  - action_check_system_status
+
+responses:
+  utter_greet:
+    - text: |
+        Olá! 👋 Sou o **TechBot**, assistente de suporte de TI universitário!
+        
+        Posso te ajudar com:
+      buttons:
+        - title: "🌐 Wi-Fi"
+          payload: "/ask_wifi"
+        - title: "📧 E-mail"
+          payload: "/ask_email"
+        - title: "🔐 Senha"
+          payload: "/ask_password_reset"
+        - title: "💻 Software"
+          payload: "/ask_software"
+        - title: "🖨️ Impressora"
+          payload: "/ask_printer"
+        - title: "📚 Moodle"
+          payload: "/ask_moodle"
+        - title: "🎓 Portal/Matrícula"
+          payload: "/ask_portal"
+        - title: "🔒 VPN"
+          payload: "/ask_vpn"
+        - title: "🛡️ Antivírus"
+          payload: "/ask_antivirus"
+        - title: "🐌 PC Lento"
+          payload: "/ask_computer_slow"
+        - title: "🖥️ Laboratórios"
+          payload: "/ask_lab"
+        - title: "☁️ Nuvem"
+          payload: "/ask_cloud_storage"
+        - title: "🔐 Segurança"
+          payload: "/ask_security"
+        - title: "📱 Celular"
+          payload: "/ask_mobile"
+        - title: "🎥 Videoconferência"
+          payload: "/ask_videoconference"
+        - title: "🌐 Acesso Remoto"
+          payload: "/ask_remote_access"
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+        - title: "📊 Status dos Sistemas"
+          payload: "/check_system_status"
+
+  utter_goodbye:
+    - text: "Até logo! 👋 Qualquer dúvida, é só chamar. Tenha um ótimo dia! 😊"
+
+  utter_thank:
+    - text: "De nada! 😊 Posso ajudar com mais alguma coisa?"
+    - text: "Por nada! 👍 Estou aqui sempre que precisar."
+    - text: "Disponha! 🎉 Se tiver mais dúvidas, é só perguntar!"
+
+  utter_bot_challenge:
+    - text: "Sou o TechBot 🤖, um assistente virtual de suporte técnico universitário! Não sou humano, mas faço o melhor que posso! 😄"
+
+  # ── Tópicos originais ────────────────────────────────────
+
+  utter_ask_wifi:
+    - text: |
+        🌐 **Problemas com Wi-Fi? Siga os passos:**
+
+        1️⃣ Conecte-se à rede **Eduroam** ou **UniNet**
+        2️⃣ Use seu e-mail institucional e senha do sistema
+        3️⃣ Esqueça a rede e reconecte nas configurações
+        4️⃣ Atualize o driver de rede (Gerenciador de Dispositivos)
+        5️⃣ No prompt de comando execute: `netsh winsock reset`
+
+        ❓ Problema persistente? Ligue: 📞 (11) 3333-4444
+      buttons:
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+        - title: "📞 Ver Contatos"
+          payload: "/ask_contact_support"
+
+  utter_ask_email:
+    - text: |
+        📧 **E-mail Institucional:**
+
+        🌐 Acesse: webmail.universidade.edu.br
+
+        📱 **Configuração Outlook/celular:**
+        - IMAP: `imap.universidade.edu.br` (porta 993)
+        - SMTP: `smtp.universidade.edu.br` (porta 587)
+
+        🔑 Senha expirada? Senhas vencem a cada 90 dias.
+        Redefina em: senha.universidade.edu.br
+      buttons:
+        - title: "🔐 Redefinir Senha"
+          payload: "/ask_password_reset"
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+
+  utter_ask_password_reset:
+    - text: |
+        🔐 **Redefinição de Senha:**
+
+        **Via portal (autoatendimento):**
+        1. Acesse: senha.universidade.edu.br
+        2. Clique em "Esqueci minha senha"
+        3. Informe CPF ou matrícula
+        4. Receba código no e-mail pessoal cadastrado
+        5. Crie nova senha
+
+        **Presencialmente:** Vá ao suporte com documento de identidade.
+
+        📋 **Requisitos:** Mín. 8 caracteres, maiúsculas, minúsculas, número e símbolo.
+      buttons:
+        - title: "🎫 Ainda com problema? Abrir Chamado"
+          payload: "/open_ticket"
+
+  utter_ask_software:
+    - text: |
+        💻 **Softwares disponíveis para alunos (gratuitos):**
+
+        ✅ **Microsoft Office 365** → office.com (e-mail institucional)
+        ✅ **AutoCAD** → autodesk.com/education
+        ✅ **MATLAB** → portal de software da universidade
+        ✅ **Antivírus** → Kaspersky/ESET gratuito
+        ✅ **Adobe Creative Cloud** → plano educacional
+
+        🌐 Portal: software.universidade.edu.br
+
+  utter_ask_printer:
+    - text: |
+        🖨️ **Impressoras no campus:**
+
+        **Impressão via portal:**
+        1. Conecte-se à rede institucional
+        2. Acesse: impressao.universidade.edu.br
+        3. Envie o arquivo e retire na impressora mais próxima
+
+        **Impressora offline?**
+        - Cancele todos os trabalhos na fila
+        - Services > Print Spooler > Reiniciar
+
+        📞 Suporte: (11) 3333-4444
+      buttons:
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+
+  utter_ask_moodle:
+    - text: |
+        📚 **Problemas com Moodle/AVA:**
+
+        🌐 Acesse: moodle.universidade.edu.br
+
+        **Não consegue fazer login?**
+        - Use credenciais institucionais
+        - Limpe o cache: Ctrl+Shift+Delete
+        - Tente Chrome ou Firefox
+
+        **Disciplina não aparece?**
+        - O professor precisa te matricular na turma
+        - Aguarde até 24h após a matrícula
+
+        📧 Suporte Moodle: moodle@universidade.edu.br
+
+  utter_ask_matricula:
+    - text: |
+        🎓 **Sistema de Matrícula:**
+
+        🌐 Acesse: matricula.universidade.edu.br
+
+        **Sistema lento ou fora do ar?**
+        - Tente nos horários de menor pico (manhã cedo / noite)
+        - Limpe o cache do navegador
+
+        **Disciplina indisponível?**
+        - Verifique pré-requisitos
+        - Algumas turmas têm vagas limitadas
+
+        📞 Secretaria Acadêmica: (11) 3333-5555
+      buttons:
+        - title: "📊 Ver Status dos Sistemas"
+          payload: "/check_system_status"
+
+  utter_ask_portal:
+    - text: |
+        🎓 **Portal do Aluno:**
+
+        🌐 Acesse: portal.universidade.edu.br
+
+        **Primeiro acesso:**
+        - Usuário: número de matrícula
+        - Senha inicial: CPF (só números)
+
+        **No portal você encontra:**
+        📋 Histórico escolar | 📄 Declarações
+        📅 Horários | 💰 Financeiro | 📊 Notas
+
+        ❓ Problemas: 📞 (11) 3333-4444
+      buttons:
+        - title: "📊 Status dos Sistemas"
+          payload: "/check_system_status"
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+
+  utter_ask_computer_slow:
+    - text: |
+        🐌 **Computador lento? Veja as soluções:**
+
+        **Rápido:**
+        1️⃣ Reinicie o computador
+        2️⃣ Feche programas (Ctrl+Shift+Esc)
+        3️⃣ Verifique uso de CPU/RAM no Gerenciador de Tarefas
+
+        **Mais profundo:**
+        4️⃣ Desative programas na inicialização (`msconfig`)
+        5️⃣ Limpeza de disco (`cleanmgr`)
+        6️⃣ Scan de vírus completo
+
+        🔧 Problema persiste? Leve ao suporte com seu equipamento.
+      buttons:
+        - title: "🛡️ Verificar Vírus"
+          payload: "/ask_antivirus"
+        - title: "🎫 Abrir Chamado Técnico"
+          payload: "/open_ticket"
+
+  utter_ask_contact_support:
+    - text: |
+        📞 **Contato com o Suporte de TI:**
+
+        📞 Telefone: (11) 3333-4444
+        📧 E-mail: suporte.ti@universidade.edu.br
+        💬 WhatsApp: (11) 99999-8888
+        🌐 Chamados: suporte.universidade.edu.br
+
+        📍 **Presencial:** Bloco T, Sala 108 — Campus Central
+        🕐 Seg–Sex: 8h às 19h | Sáb: 9h às 13h
+      buttons:
+        - title: "🎫 Abrir Chamado Online Agora"
+          payload: "/open_ticket"
+
+  utter_ask_hours:
+    - text: |
+        🕐 **Horário de Atendimento:**
+
+        📅 Segunda a Sexta: 8h às 19h
+        📅 Sábado: 9h às 13h
+        ❌ Domingo e Feriados: Fechado
+
+        💻 Portal de chamados: 24h/7 dias
+        🌐 suporte.universidade.edu.br
+
+        ⚡ Emergências (sistemas críticos): 📞 (11) 99999-7777
+
+  utter_ask_vpn:
+    - text: |
+        🔒 **VPN Institucional:**
+
+        **Para que serve:** Acessa sistemas internos fora do campus.
+
+        **Instalação:**
+        1. Baixe o cliente: vpn.universidade.edu.br
+        2. Instale o **Cisco AnyConnect** ou **OpenVPN**
+        3. Configure:
+           - Servidor: `vpn.universidade.edu.br`
+           - Usuário: e-mail institucional
+
+        **VPN não conecta?**
+        - Verifique sua internet
+        - Desative temporariamente o firewall
+        - Tente mudar o protocolo (UDP/TCP)
+      buttons:
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+
+  utter_ask_antivirus:
+    - text: |
+        🛡️ **Antivírus Institucional (Gratuito!):**
+
+        **Como obter:**
+        1. Acesse: software.universidade.edu.br
+        2. Login com credenciais institucionais
+        3. Baixe **Kaspersky** ou **ESET NOD32**
+        4. Ative com a chave fornecida no portal
+
+        **Suspeita de vírus?**
+        1. Desconecte da internet
+        2. Execute varredura completa
+        3. Não abra arquivos suspeitos
+        4. Persistindo: leve ao suporte presencial
+
+  # ── Novos tópicos ────────────────────────────────────────
+
+  utter_ask_lab:
+    - text: |
+        🖥️ **Laboratórios de Informática:**
+
+        📍 **Localização:** Bloco A (Labs 101–105) | Bloco B (Labs 201–203)
+
+        🕐 **Horário de funcionamento:**
+        Seg–Sex: 7h30 às 22h | Sáb: 8h às 17h
+
+        **Regras de uso:**
+        ✅ Necessário carteirinha/crachá de identificação
+        ✅ Máximo 3h de uso contínuo em horário de pico
+        ❌ Proibido alimentos e bebidas
+        ❌ Proibido instalação de software sem autorização
+
+        🌐 **Reserva de laboratório:** lab.universidade.edu.br
+        📞 Coordenação de laboratórios: (11) 3333-6666
+      buttons:
+        - title: "🎫 Solicitar Reserva"
+          payload: "/open_ticket"
+        - title: "📊 Status dos Sistemas"
+          payload: "/check_system_status"
+
+  utter_ask_cloud_storage:
+    - text: |
+        ☁️ **Armazenamento em Nuvem Institucional:**
+
+        **Microsoft OneDrive:**
+        ✅ **1 TB** de espaço gratuito para alunos
+        🌐 Acesse: onedrive.live.com com e-mail institucional
+        📥 Sincronize com Windows: baixe o app OneDrive
+
+        **Google Drive Institucional:**
+        ✅ Armazenamento ilimitado (enquanto vinculado à universidade)
+        🌐 Acesse: drive.google.com com e-mail @universidade.edu.br
+
+        **Dicas importantes:**
+        💡 Faça backup dos seus TCCs e projetos na nuvem!
+        ⚠️ O acesso expira 6 meses após a formatura
+        🔐 Nunca compartilhe arquivos sigilosos em links públicos
+
+  utter_ask_security:
+    - text: |
+        🔐 **Segurança da Informação — Dicas Essenciais:**
+
+        **🎣 Phishing (e-mails falsos):**
+        ❌ Nunca clique em links suspeitos
+        ❌ A universidade NUNCA pede senha por e-mail
+        ✅ Verifique o remetente: deve terminar em @universidade.edu.br
+        ✅ Em dúvida, acesse o site diretamente pelo navegador
+
+        **🔑 Senhas seguras:**
+        ✅ Mínimo 12 caracteres
+        ✅ Use um gerenciador de senhas (Bitwarden, 1Password)
+        ✅ Ative autenticação em dois fatores (2FA)
+        ❌ Nunca reutilize senhas
+
+        **💻 Segurança no dispositivo:**
+        ✅ Mantenha o SO e antivírus atualizados
+        ✅ Não conecte pen drives desconhecidos
+        ✅ Use a VPN em redes Wi-Fi públicas
+        ❌ Não deixe sessões abertas em computadores compartilhados
+
+        🚨 **Suspeita de incidente de segurança?**
+        📧 seguranca.ti@universidade.edu.br | 📞 (11) 3333-9999
+      buttons:
+        - title: "🛡️ Obter Antivírus Grátis"
+          payload: "/ask_antivirus"
+        - title: "🔒 Configurar VPN"
+          payload: "/ask_vpn"
+
+  utter_ask_mobile:
+    - text: |
+        📱 **Configuração em Dispositivos Móveis:**
+
+        **📧 E-mail no celular (Android/iOS):**
+        1. Abra o app de e-mail (Gmail, Outlook, Mail)
+        2. Adicione conta > Outra conta
+        3. Configure:
+           - IMAP: `imap.universidade.edu.br` porta 993
+           - SMTP: `smtp.universidade.edu.br` porta 587
+           - Login: seu e-mail institucional completo
+
+        **🌐 Wi-Fi Eduroam no celular:**
+        - Método EAP: PEAP
+        - Fase 2: MSCHAPV2
+        - Identidade: seu e-mail institucional
+        - Senha: sua senha institucional
+
+        **🔒 VPN no celular:**
+        1. Baixe **Cisco AnyConnect** na loja de apps
+        2. Servidor: `vpn.universidade.edu.br`
+        3. Use credenciais institucionais
+
+        **📚 App Moodle:**
+        🤖 Android: busque "Moodle" na Play Store
+        🍎 iOS: busque "Moodle" na App Store
+        Configure com: moodle.universidade.edu.br
+
+  utter_ask_videoconference:
+    - text: |
+        🎥 **Videoconferência Institucional:**
+
+        **Microsoft Teams:**
+        🌐 Acesse: teams.microsoft.com com e-mail institucional
+        📱 Baixe o app para mobile e desktop
+        ✅ Disponível gratuitamente para todos os alunos e professores
+
+        **Google Meet:**
+        🌐 meet.google.com com e-mail @universidade.edu.br
+        ✅ Reuniões de até 24h sem limite de participantes
+
+        **Zoom Educacional:**
+        🌐 zoom.us → Login com SSO → domínio: universidade
+        ⏱️ Sem limite de 40 minutos (conta educacional)
+
+        **Dicas para melhor experiência:**
+        🎧 Use fone de ouvido para evitar eco
+        🌐 Use Wi-Fi ao invés de dados móveis
+        💡 Feche outros aplicativos durante a chamada
+        🔇 Fique no mudo quando não estiver falando
+
+      buttons:
+        - title: "🌐 Problemas de Wi-Fi?"
+          payload: "/ask_wifi"
+        - title: "🎫 Abrir Chamado"
+          payload: "/open_ticket"
+
+  utter_ask_remote_access:
+    - text: |
+        🖥️ **Acesso Remoto aos Computadores da Universidade:**
+
+        **Opção 1 — VPN + RDP (acesso completo):**
+        1. Conecte-se à VPN institucional (vpn.universidade.edu.br)
+        2. No Windows: `Win + R` → digite `mstsc`
+        3. Insira o IP do computador remoto (solicite ao suporte)
+        4. Use suas credenciais institucionais
+
+        **Opção 2 — Portal de Acesso Remoto:**
+        🌐 remoto.universidade.edu.br
+        Acesse sistemas e aplicativos direto pelo navegador!
+
+        **Opção 3 — Aplicativos disponíveis remotamente:**
+        ✅ MATLAB, AutoCAD, SPSS via portal remoto
+
+        **Requisitos:**
+        - Conexão estável de internet (mín. 5 Mbps)
+        - VPN configurada e ativa
+        - Autorização do coordenador (para Labs específicos)
+
+        📞 Para obter acesso: (11) 3333-4444
+      buttons:
+        - title: "🔒 Configurar VPN"
+          payload: "/ask_vpn"
+        - title: "🎫 Solicitar Acesso"
+          payload: "/open_ticket"
+
+  # ── Form: Abertura de Chamado ─────────────────────────────
+
+  utter_ask_open_ticket:
+    - text: |
+        🎫 **Abertura de Chamado de Suporte**
+
+        Vou precisar de algumas informações para abrir seu chamado.
+        Pode digitar para cancelar a qualquer momento.
+
+  utter_ask_user_name:
+    - text: "👤 Qual é o seu **nome completo**?"
+
+  utter_ask_user_matricula:
+    - text: "🎓 Qual é o seu **número de matrícula**?"
+
+  utter_ask_problema_descricao:
+    - text: "📋 Descreva o **problema** com o máximo de detalhes possível (o que acontece, quando começou, mensagens de erro, etc.):"
+
+  # ── Feedback ──────────────────────────────────────────────
+
+  utter_ask_feedback:
+    - text: "Consegui te ajudar? 😊"
+      buttons:
+        - title: "👍 Sim, problema resolvido!"
+          payload: "/give_feedback_positive"
+        - title: "👎 Não, ainda tenho dúvidas"
+          payload: "/give_feedback_negative"
+
+  utter_feedback_positive:
+    - text: "Ótimo! 🎉 Fico feliz em ter ajudado! Se tiver mais dúvidas, é só chamar. 😊"
+    - text: "Que bom! 🌟 Qualquer coisa estou aqui. Tenha um ótimo dia!"
+
+  utter_feedback_negative:
+    - text: |
+        Entendo, sinto muito pela dificuldade. 😔
+
+        Posso te ajudar de outras formas:
+      buttons:
+        - title: "🎫 Abrir Chamado com Técnico"
+          payload: "/open_ticket"
+        - title: "📞 Ver Contatos do Suporte"
+          payload: "/ask_contact_support"
+
+  # ── Fallback ──────────────────────────────────────────────
+
+  utter_default:
+    - text: |
+        Desculpe, não entendi sua pergunta. 🤔
+
+        Posso ajudar com:
+        🌐 Wi-Fi | 📧 E-mail | 🔐 Senha | 💻 Software
+        🖨️ Impressora | 📚 Moodle | 🎓 Portal/Matrícula
+        🔒 VPN | 🛡️ Antivírus | 🐌 PC lento
+        🖥️ Laboratórios | ☁️ Nuvem | 🔐 Segurança
+        📱 Celular | 🎥 Videoconferência | 🌐 Acesso Remoto
+        🎫 Abrir Chamado | 📊 Status dos Sistemas
+
+        Pode reformular?
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

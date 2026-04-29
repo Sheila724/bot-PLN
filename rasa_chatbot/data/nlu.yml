@@ -1,0 +1,491 @@
+version: "3.1"
+
+nlu:
+  - intent: greet
+    examples: |
+      - Olá
+      - Oi
+      - Bom dia
+      - Boa tarde
+      - Boa noite
+      - Olá, preciso de ajuda
+      - Oi, tudo bem?
+      - Ei, pode me ajudar?
+      - Olá! Preciso de suporte
+      - Salve
+      - E aí, pode me ajudar?
+      - Preciso de ajuda
+
+  - intent: goodbye
+    examples: |
+      - Tchau
+      - Até mais
+      - Obrigado, tchau
+      - Até logo
+      - Encerrar
+      - Até
+      - Valeu, até mais
+      - Obrigado pela ajuda, tchau
+      - Encerrar atendimento
+      - Xau
+      - Pode fechar
+      - Não preciso de mais nada
+
+  - intent: affirm
+    examples: |
+      - Sim
+      - Claro
+      - Pode ser
+      - Exato
+      - Isso mesmo
+      - Correto
+      - Com certeza
+      - É isso
+      - Sim, por favor
+      - Quero
+      - Ok
+      - Tudo bem
+
+  - intent: deny
+    examples: |
+      - Não
+      - Não quero
+      - Não preciso
+      - Não é isso
+      - Errado
+      - Negativo
+      - Não obrigado
+      - Cancelar
+      - Pare
+      - Para
+
+  - intent: thank
+    examples: |
+      - Obrigado
+      - Muito obrigado
+      - Valeu
+      - Obrigada
+      - Agradeço a ajuda
+      - Foi ótimo, obrigado
+      - Resolveu meu problema, obrigado
+      - Ótimo atendimento
+      - Consegui resolver, obrigado
+      - Muito grato
+      - Ajudou bastante
+
+  - intent: bot_challenge
+    examples: |
+      - Você é um robô?
+      - Estou falando com um humano?
+      - Você é uma IA?
+      - Isso é um bot?
+      - Você é real?
+      - Quem está me atendendo?
+      - Você é um chatbot?
+      - Isso é automático?
+      - Você é uma máquina?
+      - É um sistema automático?
+
+  - intent: ask_wifi
+    examples: |
+      - Não consigo conectar ao Wi-Fi
+      - O Wi-Fi da universidade não funciona
+      - Como conecto ao Wi-Fi institucional?
+      - Minha internet está caindo
+      - O Wi-Fi está lento
+      - Não aparece a rede Wi-Fi
+      - Como faço para conectar ao eduroam?
+      - Tenho problemas com a rede sem fio
+      - A rede Wi-Fi fica caindo
+      - Wi-Fi não conecta no meu notebook
+      - Sem acesso à internet no campus
+      - Internet caindo o tempo todo
+      - Não acho a rede da universidade
+      - Rede sem fio com problema
+
+  - intent: ask_email
+    examples: |
+      - Não consigo acessar meu e-mail institucional
+      - Como configuro o e-mail da universidade?
+      - Esqueci a senha do meu e-mail
+      - Meu e-mail parou de funcionar
+      - Como faço login no webmail?
+      - O e-mail institucional não abre
+      - Tenho problemas com o e-mail universitário
+      - Como configuro o e-mail no Outlook?
+      - O webmail não carrega
+      - Meu e-mail universitário está bloqueado
+      - Como criar meu e-mail institucional?
+
+  - intent: ask_password_reset
+    examples: |
+      - Esqueci minha senha
+      - Como redefinir minha senha?
+      - Minha senha expirou
+      - Não consigo fazer login
+      - Como alterar minha senha de acesso?
+      - Preciso resetar minha senha
+      - Senha inválida no portal
+      - Bloqueei minha conta por tentativas erradas
+      - Como faço para recuperar minha senha?
+      - Não lembro minha senha do sistema
+      - Conta bloqueada
+      - Senha incorreta
+      - Como trocar a senha do sistema?
+
+  - intent: ask_software
+    examples: |
+      - Como instalo o pacote Office?
+      - Preciso de licença para software
+      - Como baixar o AutoCAD pela universidade?
+      - A universidade oferece softwares gratuitos?
+      - Onde baixo os softwares licenciados?
+      - Como ativo o Microsoft Office?
+      - A universidade tem licença do Matlab?
+      - Quais softwares estão disponíveis para alunos?
+      - Softwares gratuitos para alunos
+      - Licença Office grátis
+      - Como baixar programas da universidade?
+
+  - intent: ask_printer
+    examples: |
+      - A impressora não funciona
+      - Como imprimo na universidade?
+      - Onde ficam as impressoras do campus?
+      - A impressora está offline
+      - Não consigo instalar a impressora
+      - Como configuro a impressora no meu notebook?
+      - Impressão com erro
+      - A impressora não reconhece meu documento
+      - Como faço para imprimir no laboratório?
+      - Impressora travada
+      - Fila de impressão parada
+      - Não consigo imprimir
+
+  - intent: ask_moodle
+    examples: |
+      - Não consigo acessar o Moodle
+      - O Moodle está fora do ar
+      - Como envio uma atividade no Moodle?
+      - Não aparece a disciplina no Moodle
+      - Como faço login no AVA?
+      - Meu acesso ao Moodle está bloqueado
+      - O professor não me adicionou no Moodle
+      - Como baixo material do Moodle?
+      - O Moodle não carrega
+      - AVA com problema
+      - Não vejo minhas disciplinas no Moodle
+      - Problema para enviar tarefa no Moodle
+
+  - intent: ask_matricula
+    examples: |
+      - Como faço minha matrícula?
+      - O sistema de matrícula não abre
+      - Não consigo selecionar as disciplinas
+      - A matrícula online está com erro
+      - O portal de matrícula está fora do ar
+      - Tenho problemas com o sistema de matrícula
+      - Como tranco uma disciplina?
+      - O sistema de matrículas trava
+      - Matrícula não processa
+      - Erro ao matricular em disciplina
+
+  - intent: ask_portal
+    examples: |
+      - Não consigo acessar o portal do aluno
+      - O portal está fora do ar
+      - Como acesso meu histórico escolar?
+      - O portal não carrega
+      - Tenho erro ao fazer login no portal
+      - Como emito minha declaração de matrícula?
+      - O portal está lento
+      - Não consigo baixar meu boleto no portal
+      - Como acesso o portal pela primeira vez?
+      - Portal do aluno com erro
+      - Quero ver meu histórico
+
+  - intent: ask_computer_slow
+    examples: |
+      - Meu computador está muito lento
+      - O notebook trava bastante
+      - Como deixar meu computador mais rápido?
+      - O sistema está travando
+      - Meu PC demora para iniciar
+      - O computador do laboratório está lento
+      - Como liberar memória RAM?
+      - O processador está a 100%
+      - O computador aquece muito e trava
+      - PC lento
+      - Computador não responde
+      - Notebook superaquecendo
+
+  - intent: ask_contact_support
+    examples: |
+      - Preciso falar com um técnico
+      - Como entro em contato com o suporte de TI?
+      - Qual o telefone do suporte técnico?
+      - Posso abrir um chamado?
+      - Preciso de atendimento presencial
+      - Onde fica o suporte de TI?
+      - Quero falar com um atendente
+      - Como chamo um técnico?
+      - Qual o e-mail do suporte técnico?
+      - Telefone do suporte
+      - Número do suporte de TI
+
+  - intent: ask_hours
+    examples: |
+      - Qual o horário de atendimento?
+      - O suporte funciona aos fins de semana?
+      - Até que horas o suporte atende?
+      - Quais são os horários de funcionamento?
+      - O suporte técnico abre no sábado?
+      - Que horas abre o suporte de TI?
+      - O atendimento é 24 horas?
+      - O suporte fecha para almoço?
+      - Horário do suporte
+      - Funcionamento do setor de TI
+
+  - intent: ask_vpn
+    examples: |
+      - Como acesso a VPN da universidade?
+      - Não consigo conectar à VPN
+      - O que é a VPN institucional?
+      - Como instalo a VPN?
+      - A VPN não conecta
+      - Como acesso recursos internos de fora da universidade?
+      - Erro ao conectar na VPN
+      - VPN da faculdade
+      - Como usar VPN universitária?
+      - Acesso remoto à universidade
+      - Preciso de VPN para trabalhar de casa
+
+  - intent: ask_antivirus
+    examples: |
+      - Como instalo o antivírus?
+      - A universidade oferece antivírus gratuito?
+      - Meu computador pode ter vírus
+      - O antivírus não atualiza
+      - Como faço uma varredura de vírus?
+      - Meu antivírus expirou
+      - Qual antivírus devo usar?
+      - Como removo um vírus do computador?
+      - Acho que meu PC está infectado
+      - Antivírus gratuito para aluno
+      - PC com vírus
+      - Como me protejo de vírus?
+
+  # ── Novos tópicos ────────────────────────────────────────
+
+  - intent: ask_lab
+    examples: |
+      - Onde ficam os laboratórios de informática?
+      - Quais os horários dos laboratórios?
+      - Como reservo um laboratório?
+      - Os laboratórios estão abertos?
+      - Qual o horário do lab de computação?
+      - Como uso os computadores do laboratório?
+      - Preciso de um laboratório para aula
+      - Os labs têm impressora?
+      - Tenho acesso aos laboratórios no sábado?
+      - Como entro no laboratório de TI?
+      - Lab de informática aberto
+      - Regras do laboratório
+      - Posso reservar sala de informática?
+      - Horário do laboratório de computadores
+
+  - intent: ask_cloud_storage
+    examples: |
+      - Como acesso o OneDrive da universidade?
+      - Tenho Google Drive institucional?
+      - Como faço backup na nuvem?
+      - Quanto de espaço tenho no OneDrive?
+      - Como sincronizo arquivos na nuvem?
+      - Armazenamento em nuvem para alunos
+      - Onde salvo meus arquivos da universidade?
+      - A universidade oferece espaço na nuvem?
+      - Como uso o OneDrive com e-mail institucional?
+      - Perco o OneDrive após formatura?
+      - Nuvem gratuita para estudantes
+      - Google Drive universitário
+      - Como fazer backup dos meus TCC?
+
+  - intent: ask_security
+    examples: |
+      - Como me protejo de phishing?
+      - Recebi um e-mail suspeito da universidade
+      - Minha conta pode ter sido hackeada
+      - Como criar uma senha segura?
+      - O que é autenticação de dois fatores?
+      - Como ativar 2FA?
+      - Recebi um e-mail pedindo minha senha
+      - É golpe esse e-mail?
+      - Segurança da informação
+      - Como me proteger online?
+      - Phishing na universidade
+      - Alguém pode ter acessado minha conta
+      - Boas práticas de segurança digital
+      - Minha conta foi invadida
+      - Como detectar vírus e malware?
+      - Dicas de segurança no computador
+
+  - intent: ask_mobile
+    examples: |
+      - Como configuro o e-mail no celular?
+      - Wi-Fi eduroam no celular
+      - Como instalo o Moodle no celular?
+      - Configurar e-mail institucional no iPhone
+      - Configurar e-mail no Android
+      - VPN no celular
+      - Como acesso o portal pelo celular?
+      - App Moodle no smartphone
+      - Configurar e-mail no Samsung
+      - Wi-Fi da universidade no celular não conecta
+      - Suporte para dispositivos móveis
+      - Como configuro o e-mail universitário no iOS?
+      - Eduroam no Android
+      - Configurações mobile da universidade
+
+  - intent: ask_videoconference
+    examples: |
+      - Como uso o Microsoft Teams?
+      - Preciso fazer uma videoconferência
+      - Como entro em uma reunião no Teams?
+      - Google Meet institucional
+      - Zoom para alunos universitários
+      - Como faço uma reunião online?
+      - Video conferência pela universidade
+      - Problemas com Teams
+      - Como compartilho tela no Meet?
+      - Ferramenta de videoconferência disponível
+      - Como gravar uma reunião online?
+      - Conferência online para aula
+      - Plataforma de vídeo chamada
+      - Reunião virtual pela universidade
+
+  - intent: ask_remote_access
+    examples: |
+      - Como acesso meu computador da universidade de casa?
+      - Acesso remoto aos PCs do lab
+      - Como uso RDP na universidade?
+      - Posso acessar os sistemas de casa?
+      - Como trabalho remotamente pelos sistemas da universidade?
+      - Acesso remoto ao computador do laboratório
+      - Portal de acesso remoto
+      - Como conectar remotamente à universidade?
+      - Trabalhar de casa com sistemas universitários
+      - Acesso remoto ao campus
+      - Remote desktop universidade
+      - Como uso MATLAB de casa?
+      - Acessar AutoCAD remotamente
+
+  # ── Abertura de chamado ───────────────────────────────────
+
+  - intent: open_ticket
+    examples: |
+      - Quero abrir um chamado
+      - Preciso registrar um problema
+      - Abrir ticket de suporte
+      - Registrar ocorrência
+      - Criar chamado
+      - Quero formalizar meu problema
+      - Como abro um chamado técnico?
+      - Preciso de suporte formal
+      - Registrar problema no sistema
+      - Abrir solicitação de suporte
+      - Criar ticket
+      - Fazer chamado de TI
+      - Registrar chamado
+
+  # ── Status dos sistemas ───────────────────────────────────
+
+  - intent: check_system_status
+    examples: |
+      - Os sistemas estão funcionando?
+      - Status dos sistemas
+      - O Moodle está fora do ar?
+      - O portal está online?
+      - Verificar disponibilidade dos sistemas
+      - Há algum sistema offline?
+      - Está tendo problema nos sistemas?
+      - Os serviços estão operacionais?
+      - Status da TI
+      - Algum sistema em manutenção?
+      - Verificar se portal está funcionando
+      - Os sistemas estão no ar?
+      - Manutenção programada?
+
+  # ── Feedback ─────────────────────────────────────────────
+
+  - intent: give_feedback_positive
+    examples: |
+      - Sim, resolveu!
+      - Consegui resolver
+      - Funcionou!
+      - Resolveu meu problema
+      - Sim, obrigado
+      - Deu certo
+      - Perfeito, obrigado
+      - Sim, era isso
+      - Problema resolvido
+      - Tudo certo agora
+
+  - intent: give_feedback_negative
+    examples: |
+      - Não resolveu
+      - Ainda tenho o problema
+      - Não funcionou
+      - O problema continua
+      - Não consegui resolver
+      - Não ajudou
+      - Ainda com dificuldade
+      - Problema persiste
+      - Não deu certo
+      - Ainda não funciona
+
+  # ── Entidades ─────────────────────────────────────────────
+
+  - lookup: os_type
+    examples: |
+      - windows
+      - win
+      - win10
+      - win11
+      - windows 10
+      - windows 11
+      - macos
+      - mac
+      - macbook
+      - osx
+      - linux
+      - ubuntu
+      - fedora
+      - debian
+      - android
+      - ios
+      - iphone
+      - ipad
+
+  - synonym: windows
+    examples: |
+      - win
+      - win10
+      - win11
+      - windows 10
+      - windows 11
+      - microsoft windows
+
+  - synonym: macos
+    examples: |
+      - mac
+      - macbook
+      - osx
+      - os x
+      - apple mac
+
+  - synonym: linux
+    examples: |
+      - ubuntu
+      - fedora
+      - debian
+      - linux mint
