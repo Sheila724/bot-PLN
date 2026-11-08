@@ -38,9 +38,16 @@ wheels/
 .DS_Store
 Thumbs.db
 
-# Modelos
+# Rasa: modelos treinados, cache e resultados de teste (gerados por "rasa train" e "rasa test")
 models/
 *.tar.gz
+.rasa/
+results/
+graph.html
+story_graph.dot
+
+# Segredos
+.env
 
 # Logs
 *.log
